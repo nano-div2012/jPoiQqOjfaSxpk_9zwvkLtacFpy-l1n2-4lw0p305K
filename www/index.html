@@ -1,11 +1,310 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <meta http-equiv="Refresh" content="0; url='https://example.com/'" />
-    <script>window.location.replace("https://example.com/");</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>RENZ - APK Native Control Panel</title>
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: #131a2a;
+            --border-color: #1f2a44;
+            --accent-cyan: #00f2fe;
+            --accent-blue: #4facfe;
+            --btn-on: #10b981;
+            --btn-on-hover: #059669;
+            --btn-off: #ef4444;
+            --btn-off-hover: #dc2626;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        body.screen-bright {
+            background-color: #ffffff;
+            color: #0f172a;
+        }
+
+        .banner {
+            text-align: center;
+            padding: 35px 15px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 242, 254, 0.12);
+        }
+
+        .banner h1 {
+            font-size: clamp(3.5rem, 12vw, 5.5rem);
+            font-weight: 900;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(79, 172, 254, 0.4);
+            margin-bottom: 6px;
+        }
+
+        .banner p {
+            color: var(--text-muted);
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+            gap: 18px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            color: var(--text-main);
+        }
+
+        .card h3 {
+            font-size: 17px;
+            margin-bottom: 12px;
+            color: var(--accent-cyan);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn-on { background-color: var(--btn-on); }
+        .btn-on:active { background-color: var(--btn-on-hover); }
+
+        .btn-off { background-color: var(--btn-off); }
+        .btn-off:active { background-color: var(--btn-off-hover); }
+
+        .btn-alt {
+            background-color: #3b82f6;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: #0b0f19;
+            color: white;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        video {
+            width: 100%;
+            height: 180px;
+            background: #000;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .output-box {
+            background: #0b0f19;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #cbd5e1;
+            min-height: 60px;
+            max-height: 140px;
+            overflow-y: auto;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .status-text {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #34d399;
+            min-height: 16px;
+        }
+
+        .media-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 8px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .media-preview img, .media-preview video {
+            width: 100%;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .hidden-input {
+            display: none;
+        }
+    </style>
 </head>
-<body style="margin:0;padding:0;background-color:#ffffff;display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;">
-    Redirecting...
-</body>
-</html>
+<body>
+
+    <header class="banner">
+        <h1>RENZ</h1>
+        <p>Android APK Native Control Panel</p>
+    </header>
+
+    <main class="grid">
+
+        <!-- 1. KAMERA DEPAN & BELAKANG -->
+        <section class="card">
+            <div>
+                <h3>1. Kamera Perangkat</h3>
+                <video id="cam-video" autoplay playsinline></video>
+                <button class="btn-alt" id="cam-switch">Ganti Kamera (Depan / Belakang)</button>
+                <p class="status-text" id="cam-status"></p>
+            </div>
+            <div class="controls">
+                <button class="btn-on" id="cam-on">Aktifkan</button>
+                <button class="btn-off" id="cam-off">Matikan</button>
+            </div>
+        </section>
+
+        <!-- 2. NOTIFIKASI SISTEM -->
+        <section class="card">
+            <div>
+                <h3>2. Notifikasi Sistem</h3>
+                <input type="text" id="notif-input" placeholder="Ketik pesan notifikasi...">
+                <div class="output-box" id="notif-log">Status: Siap mengirim notifikasi...</div>
+                <p class="status-text" id="notif-status"></p>
+            </div>
+            <div class="controls">
+                <button class="btn-on" id="notif-on">Aktifkan & Kirim</button>
+                <button class="btn-off" id="notif-off">Matikan</button>
+            </div>
+        </section>
+
+        <!-- 3. GALERI FOTO & VIDEO -->
+        <section class="card">
+            <div>
+                <h3>3. Galeri Foto & Video</h3>
+                <input type="file" id="media-picker" class="hidden-input" accept="image/*,video/*" multiple>
+                <div class="media-preview" id="media-grid"></div>
+                <div class="output-box" id="media-log">Tekan Aktifkan untuk membuka galeri HP.</div>
+                <p class="status-text" id="media-status"></p>
+            </div>
+            <div class="controls">
+                <button class="btn-on" id="media-on">Aktifkan</button>
+                <button class="btn-off" id="media-off">Matikan</button>
+            </div>
+        </section>
+
+        <!-- 4. LOKASI GPS REAL-TIME -->
+        <section class="card">
+            <div>
+                <h3>4. Lokasi GPS Real-Time</h3>
+                <div class="output-box" id="loc-log">
+                    Latitude : -<br>
+                    Longitude: -<br>
+                    Akurasi  : -
+                </div>
+                <p class="status-text" id="loc-status"></p>
+            </div>
+            <div class="controls">
+                <button class="btn-on" id="loc-on">Aktifkan</button>
+                <button class="btn-off" id="loc-off">Matikan</button>
+            </div>
+        </section>
+
+        <!-- 5. PEMINDAI SEMUA FILE HP -->
+        <section class="card">
+            <div>
+                <h3>5. Pemindai Semua File HP</h3>
+                <input type="file" id="file-picker" class="hidden-input" multiple>
+                <div class="output-box" id="file-log">Tekan Aktifkan untuk memilih semua file HP.</div>
+                <p class="status-text" id="file-status"></p>
+            </div>
+            <div class="controls">
+                <button class="btn-on" id="file-on">Aktifkan</button>
+                <button class="btn-off" id="file-off">Matikan</button>
+            </div>
+        </section>
+
+        <!-- 6. PERANGKAT BLUETOOTH -->
+        <section class="card">
+            <div>
+                <h3>6. Perangkat Bluetooth</h3>
+                <div class="output-box" id="bt-log">Status: Tidak terhubung</div>
+                <p class="status-text" id="bt-status"></p>
+            </div>
+            <div class="controls">
+                <button class="btn-on" id="bt-on">Aktifkan</button>
+                <button class="btn-off" id="bt-off">Matikan</button>
+            </div>
+        </section>
+
+        <!-- 7. MOTOR GETAR HP -->
+        <section class="card">
+            <div>
+                <h3>7. Motor Getar HP</h3>
+                <div class="output-box" id="vib-log">Status: Getaran mati</div>
+                <p class="status-text" id="vib-status"></p>
+            </div>
+            <div class="controls">
+                <button class="btn-on" id="vib-on">Aktifkan</button>
+                <button class="btn-off" id="vib-off">Matikan</button>
+            </div>
+        </section>
+
+        <!-- 8. STATUS WI-FI & JARINGAN -->
+        <section class="card">
+            <div>
+                <h3>8. Status Wi-Fi & Jaringan</h3>
+                <div class="output-box" id="wifi-log">Status: Nonaktif</div>
+                <p class="status-text" id="wifi-status"></p>
+            </div>
+            <div class="controls">
+                <button class="btn-on" id="wifi-on">Aktifkan</button>
+                <button class="btn-off" id="wifi-off">Matikan</button>
+            </div>
+        </section>
+
+        <!-- 9. LAYAR TETAP MENYALA & KECERAHAN -->
+        <section class="card">
